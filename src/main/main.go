@@ -3,10 +3,20 @@ package main
 import (
 	"../cmd"
 	"fmt"
+	"../classpath"
+	"strings"
 )
 
 func startJvm(command *cmd.Cmd)  {
-	fmt.Printf("classpath:%s class:%s args:%v\n", command.CpOption,command.Class, command.Args)
+	cp := classpath.Parse(command.XjreOption, command.CpOption)
+	fmt.Printf("classpath:%v class:%v args:%v\n", cp, command.Class, command.Args)
+	className := strings.Replace(command.Class, ".", "/", -1)
+	classDate, _, err := cp.ReadClass(className)
+	if err != nil {
+		fmt.Printf("Could not find or load main class %s\n", command.Class)
+		return
+	}
+	fmt.Printf("class data:%v\n", classDate)
 }
 
 func main()  {
